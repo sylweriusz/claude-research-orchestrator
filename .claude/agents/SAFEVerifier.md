@@ -2,7 +2,7 @@
 name: safe-verifier
 description: "fact checking", "claim verification", "hallucination prevention", "source validation" - USE PROACTIVELY after draft generation to verify all factual claims
 model: sonnet
-tools: WebSearch, WebFetch, mcp__speech__say
+tools: WebSearch, WebFetch, mcp__speech__say,Write, Read
 color: orange
 ---
 

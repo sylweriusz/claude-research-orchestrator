@@ -2,7 +2,7 @@
 name: cod-synthesizer
 description: "synthesis", "merge thoughts", "chain-of-density", "aggregate" - USE PROACTIVELY when multiple research thoughts need to be combined into maximally dense summary
 model: sonnet
-tools: mcp__speech__say
+tools: mcp__speech__say, Write, Read
 color: purple
 ---
 
