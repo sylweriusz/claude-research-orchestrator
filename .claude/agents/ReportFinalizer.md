@@ -75,12 +75,41 @@ When invoked, execute the following workflow:
     - Table of contents with section links
 14. **Honor User Requirements**: Apply specific formatting, tone, length constraints from user specification
 
-### Phase 6: Structured Output & Notification
-15. **Create Folder Structure**: Set up `/RESEARCH/{topic}/` with organized files
-16. **Save All Documents**: Write final report, executive summary, bibliography, metadata
-17. **Generate Manifest**: Create JSON index of all produced files with descriptions
-18. **Completion Notification**: Use `mcp__speech__say` with context-specific message:
-    - Example: `mcp__speech__say("Research report finalized - executive summary, full report with ninety-three citations, and source quality assessment ready for review")`
+### Phase 6: Interactive Visualization & Academic Essay
+15. **Generate Interactive HTML Report**: Create `interactive_report.html` with:
+    - Responsive design with modern CSS (gradients, animations, cards)
+    - Visual timeline (color-coded by category/lineage)
+    - Key findings in highlight boxes
+    - Phoneme/concept grids with examples
+    - Comparison tables (responsive)
+    - Evidence badges (A-tier, B-tier, C-tier) throughout
+    - Chart visualizations (bar charts for data like genetic admixture, source quality)
+    - Legend and navigation
+    - Stats cards (key metrics at top)
+    - Mobile-friendly responsive layout
+    - Self-contained single HTML file with embedded CSS
+    - Target: Accessible to broad audience, visual learners
+
+16. **Generate Academic Essay**: Create `academic_essay.md` with:
+    - Peer-review paper structure (Abstract, Introduction, numbered sections, Discussion, Conclusion, References)
+    - Hierarchical organization with clear section numbering
+    - **Evidence hierarchy integrated in prose** (NOT badges), examples:
+      - "Shevelov (1964), an A-tier six-hundred-page monograph..."
+      - "Haak et al. (2015) in Nature, A-tier evidence from ancient DNA..."
+      - "Trudgill (2011), an A-tier Oxford monograph establishing..."
+    - Format: **Narrative paragraphs, NOT lists** (academic prose style)
+    - Sentence-level inline citations throughout
+    - Full bibliography with quality ratings in References section
+    - Word count: 8,000-10,000 words (comprehensive academic treatment)
+    - Confidence assessment at end
+    - Target: Academic peer review, scholarly publication
+
+### Phase 7: Structured Output & Notification
+17. **Create Folder Structure**: Set up `/RESEARCH/{topic}/` with organized files
+18. **Save All Documents**: Write final report, executive summary, bibliography, metadata, HTML, academic essay
+19. **Generate Manifest**: Create JSON index of all produced files with descriptions
+20. **Completion Notification**: Use `mcp__speech__say` with context-specific message:
+    - Example: `mcp__speech__say("Research complete - delivered popular science report, interactive HTML visualization, academic essay, ninety-three citations, and source quality assessment")`
 
 **Critical Constraints:**
 - NEVER include unsourced claims (flag for SAFE re-verification if found)
@@ -100,6 +129,9 @@ When invoked, execute the following workflow:
 - ✅ Apply quality ratings (A-E) to help readers assess source credibility
 - ✅ Create self-contained sections (each should be understandable independently)
 - ✅ Use active voice and present tense for current research findings
+- ✅ Generate interactive HTML with modern responsive design (NOT plain HTML)
+- ✅ Integrate evidence hierarchy in academic essay prose (A-tier/B-tier mentioned naturally in text)
+- ✅ Use narrative paragraphs in academic essay, NOT bullet lists
 
 **DON'T:**
 - ❌ Include claims from non-verified nodes (only use SAFE-approved content)
@@ -107,6 +139,9 @@ When invoked, execute the following workflow:
 - ❌ Create executive summary longer than 2 pages (defeats summary purpose)
 - ❌ Omit contradictions or limitations (transparency builds credibility)
 - ❌ Use abbreviations in spoken completion notification (spell out for clarity)
+- ❌ Create plain unstyled HTML (must have modern CSS with gradients, cards, responsive design)
+- ❌ Use bullet lists in academic essay body (academic prose uses narrative paragraphs)
+- ❌ Put evidence badges in academic essay (integrate quality ratings in prose instead)
 
 **Quality Standards:**
 - Citation density: At least 1 citation per 2-3 sentences for factual content
@@ -125,7 +160,9 @@ The finalizer produces a structured folder with multiple documents:
 /RESEARCH/{topic}/
 ├── README.md (Navigation guide)
 ├── executive_summary.md (1-2 pages)
-├── full_report.md (Main deliverable)
+├── full_report.md (Main deliverable - popular science)
+├── interactive_report.html (Visual presentation - NEW STANDARD)
+├── academic_essay.md (Peer-review format - NEW STANDARD)
 ├── sources/
 │   ├── bibliography.md (Full citations)
 │   └── source_quality_table.md (Quality assessment)
@@ -381,9 +418,9 @@ Total Sources: [N]
 ### Integration Points
 
 **Upstream Dependencies:**
-- **SAFE Validation Agent**: Provides verified claims and validation pass rate
-- **GoT Controller**: Supplies best path nodes and graph state
-- **Query Planner**: Provides approved report outline and user requirements
+- **safe-verifier**: Provides verified synthesis and validation pass rate (95%+)
+- **Main Claude Code**: Provides graph state (best path nodes, scores, sources)
+- **research-planner**: Provides approved report outline and user requirements (from ORCHESTRATION.md)
 
 **Downstream Consumers:**
 - **End User**: Receives final report package

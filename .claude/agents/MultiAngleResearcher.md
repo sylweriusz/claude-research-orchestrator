@@ -218,15 +218,15 @@ CRISPR-Cas9 gene editing has achieved 95% reduction in off-target effects throug
 
 ### Integration Points
 
-**Graph of Thoughts Controller:**
-- Receives: Parent thought, research question, branch assignment
-- Returns: Scored thought with sources for graph state update
+**Main Claude Code (Orchestrator):**
+- Receives from Main Claude: Research angle, node ID, parent context (if deepening)
+- Returns to Main Claude: Findings (500 words), sources (6), self-score (0-10), key insights
+- Main Claude saves output to `/RESEARCH/[topic]/nodes/nX.md` and updates graph state
 
-**Aggregate Agent:**
-- Provides: Individual perspective thoughts for merging
-- Receives: Request to synthesize with other thoughts
+**cod-synthesizer:**
+- This agent's output nodes become input for synthesis (when 5-7 high-scoring nodes exist)
 
-**Refine Agent:**
+**Used in both modes:**
 - Provides: Initial thought for improvement
 - Can collaborate: Share sources if Refine needs additional context
 

@@ -11,25 +11,34 @@ Deep research [your topic]
 
 ### What Happens
 
-**IMPORTANT: Only main Claude Code can ask clarifying questions. Agents cannot use AskUserQuestion.**
+**IMPORTANT: Main Claude Code orchestrates the entire research process. Only Main Claude can ask clarifying questions using AskUserQuestion.**
 
-**Phase 1: Main Claude Asks Questions (1-2 min)**
-Main Claude will ask 2-3 clarifying questions:
-- "Dla kogo ten raport? (biznes/techniczny/akademicki)"
-- "Długość? (krótko 5 stron / średnio 15 stron / długo 25+ stron)"
-- "Czy potrzebujesz konkretne dane lub porównania?"
-- Lub Inne - wynikajace ze wstepnej analizy zakresu tematycznego.
+**Phase 1: Planning (2-3 min)**
+1. Main Claude deploys `research-planner` agent to analyze topic
+2. Planner returns: questions for user + research angles (8-25 angles based on complexity) + iteration strategy
+3. Main Claude asks user questions via AskUserQuestion
+4. Main Claude creates orchestration doc and initializes graph state
 
-**Phase 2: Agent Orchestration (30-45 min)**
-After you answer, main Claude invokes the **research-controller** agent which orchestrates 6 specialized agents in `.claude/agents/`:
-- **research-controller** - GoT orchestration, graph state management
-- **research-planner** - Topic decomposition into research questions
-- **multi-angle-researcher** - Multi-domain sourcing (Generate transformation)
-- **cod-synthesizer** - Chain-of-Density synthesis (Aggregate transformation)
-- **safe-verifier** - Fact-checking with SAFE methodology
-- **report-finalizer** - Final formatted report with citations
+**Phase 2: Iterative GoT Exploration (15-30 min)**
+Main Claude orchestrates 2-3 iterations:
+- **Iteration 1**: Spawn 5-10 `multi-angle-researcher` agents in parallel (HIGH priority angles)
+- **Iteration 2**: Deepen best paths + explore new angles (5-10 more agents)
+- **Iteration 3**: Aggregate best findings with `cod-synthesizer`
 
-**Output:** Complete research report in `./RESEARCH/[topic]/` folder
+Each iteration: spawn agents → receive scored findings → update graph → prune weak paths → decide next step
+
+**Phase 3: Verification & Finalization (10-15 min)**
+1. Main Claude deploys `safe-verifier` to validate claims (95%+ accuracy)
+2. Main Claude deploys `report-finalizer` to create deliverables
+
+**Total Time:** 25-50 min | **Total Sources:** 60-100+
+
+**Output:** Complete research package in `./RESEARCH/[topic]/` folder including:
+- Popular science report (full_report.md)
+- Executive summary
+- **Interactive HTML visualization** (interactive_report.html)
+- **Academic essay** (academic_essay.md)
+- Bibliography, graph states, source quality ratings
 
 ---
 
@@ -95,6 +104,8 @@ prep: make sure you put all of your produced documents inside of the folder /RES
 - Format for optimal readability
 - Include executive summary
 - Create proper bibliography
+- **Generate interactive HTML visualization** (standard deliverable)
+- **Generate academic essay in peer-review format** (standard deliverable)
 - Export in requested format
 
 ## How Graph of Thoughts Works for Research
@@ -202,16 +213,19 @@ Only **main Claude Code** can ask clarifying questions using AskUserQuestion. Ag
 
 **Correct Flow:**
 1. User: "Deep research [topic]"
-2. **Main Claude** asks 2-3 questions (audience, length, specific needs)
-3. User answers
-4. **Main Claude** packages requirements and invokes research-controller
-5. **Agents** execute research with packaged requirements (no questions)
+2. **Main Claude** invokes research-planner agent
+3. Planner returns: questions_for_user + research_angles + iteration_strategy
+4. **Main Claude** asks user questions via AskUserQuestion
+5. User answers
+6. **Main Claude** orchestrates GoT iterations with packaged requirements
 
 **Wrong Flow:**
 1. User: "Deep research [topic]"
-2. Main Claude immediately invokes research-controller
-3. research-planner tries to ask questions ❌ (agents can't do this)
+2. Main Claude invokes research-planner
+3. Planner tries to ask user questions directly ❌ (agents can't do this)
 4. System fails
+
+**Why this matters:** Planner generates questions FOR Main Claude to ask, but cannot ask them itself.
 
 **Implementation in Agents:**
 
@@ -750,94 +764,185 @@ I will:
 
 ## Agent-Based GoT Implementation
 
-When a user requests deep research with **"Deep research [topic]"**, the system uses dedicated agents in `.claude/agents/`:
+When a user requests deep research with **"Deep research [topic]"**, Main Claude Code orchestrates the entire process using specialized agents.
 
-### Automatic Agent Orchestration
+### Orchestration: Main Claude Code is the Controller
 
-**1. research-controller** (Main Orchestrator)
-- Maintains graph state (nodes, edges, frontier, scores)
-- Implements GoT traversal strategy
-- Deploys transformation agents based on depth and scores
-- Saves graph snapshots to `/RESEARCH/[topic]/graph_state_*.json`
+**Main Claude** handles:
+- Deploying research-planner
+- Asking user questions (AskUserQuestion)
+- Maintaining graph state (nodes, edges, frontier, scores)
+- Spawning transformation agents in parallel
+- Pruning weak paths (KeepBestN strategy)
+- Deciding when to aggregate, verify, finalize
 
-**2. research-planner** (Strategy)
-- Decomposes topic into 5-7 research questions
-- Creates hierarchical report outline
-- Estimates resources (sources needed, graph depth)
-- Presents plan for user approval
+### The 5 Specialized Agents
 
-**3. multi-angle-researcher** (Generate Transformation)
-- Executes searches across multiple domains (web, academic, technical)
-- Implements dynamic query rewriting (3+ variants per question)
-- Scores source quality (A-E rating system)
-- Returns scored thought with inline citations
+**1. research-planner** (Planning)
+- Analyzes topic complexity
+- Generates 8-25 research angles (granularity depends on topic)
+- Creates iteration strategy (which angles in iter 1, 2, 3)
+- Returns questions for Main Claude to ask user
+- Provides report outline
 
-**4. cod-synthesizer** (Aggregate Transformation)
-- Implements 5-iteration Chain-of-Density algorithm
-- Merges multiple thoughts into maximally dense synthesis
+**2. multi-angle-researcher** (Generate & Refine)
+- Executes searches for ONE specific angle
+- Dynamic query rewriting (3-4 search variations)
+- WebSearch → score sources A-E → WebFetch top 6
+- Returns: findings (500 words) + sources + self-score (0-10)
+- Used in ALL iterations for exploration and deepening
+
+**3. cod-synthesizer** (Aggregate)
+- Merges 3-7 high-scoring nodes into synthesis
+- 5-iteration Chain-of-Density algorithm
 - Preserves all citations, resolves contradictions
-- Achieves higher score than any input thought
+- Target: score > max(input_scores)
 
-**5. safe-verifier** (Fact-Checking)
-- Extracts atomic factual claims from drafts
+**4. safe-verifier** (Verification)
+- Extracts atomic claims from synthesis
 - Generates adversarial verification queries
-- Validates each claim via external search
-- Ensures 95%+ verification rate before finalization
+- Validates via WebSearch
+- Target: 95%+ pass rate
 
-**6. report-finalizer** (Final Assembly)
-- Assembles report from verified nodes following approved outline
-- Embeds sentence-level citations in format: (Author, Year, "Title", URL)
-- Generates executive summary and comprehensive bibliography
-- Creates source quality table and verification checklist
+**5. report-finalizer** (Final Assembly)
+- Reads verified synthesis + graph state
+- Creates full report, executive summary, academic essay, HTML visualization
+- Embeds sentence-level citations
+- Generates bibliography with A-E source ratings
 
-### Graph Traversal Strategy
+### Graph Traversal Strategy (Main Claude executes)
 
-The **research-controller** implements this strategy:
+**Iteration 1: Initial Exploration**
+```
+Main Claude:
+1. Spawn 5-10 multi-angle-researcher agents (HIGH priority angles, parallel)
+2. Each agent returns: {node_id, findings, sources[6], score}
+3. Save to: /RESEARCH/[topic]/nodes/n1.md, n2.md, ..., n10.md
+4. Update graph_state_1.json: add nodes, create edges, update frontier
+5. Prune: KeepBestN(7) - keep top 7 nodes
+6. Decision: IF max_score > 9.5 → skip to Aggregation, ELSE → Iteration 2
+```
 
-1. **Early Depth (0-2)**: Deploy **multi-angle-researcher** with Generate(3) to explore diverse angles
-2. **Mid Depth (2-3)**: Mixed approach - Generate for high-scoring paths, refine weak nodes
-3. **Late Depth (3-4)**: Deploy **cod-synthesizer** to Aggregate best branches
-4. **Pruning**: KeepBestN(5) at each depth level
-5. **Termination**: When max_score > 9.0 OR depth > 4 OR token budget exceeded
+**Iteration 2: Deepen + Explore**
+```
+Main Claude analyzes frontier:
+- Top 2-3 nodes (score > 8.5) → spawn 2 agents each to deepen (Generate)
+- Medium nodes (7.0-8.5) → spawn 1 agent to refine
+- Low nodes (< 7.0) → prune
+- Plus: spawn 2-4 agents for new MEDIUM priority angles
+
+Total: 6-12 agents spawned (mix of deepening + new exploration)
+
+Update graph_state_2.json
+Prune: KeepBestN(7)
+Decision: IF max_score > 9.5 OR depth > 2 → Aggregation, ELSE → Iteration 3
+```
+
+**Iteration 3: Aggregate**
+```
+Main Claude:
+1. Identify 5-7 best nodes (score > 8.5)
+2. Spawn cod-synthesizer(nodes=[n6, n8, n10, n7, n9])
+3. CoDSynthesizer returns: {synthesis_node, score: 9.6}
+4. Update graph_state_3.json
+5. → Proceed to Verification
+```
+
+**Pruning Rules:**
+- KeepBestN(7) at each depth level
+- Never prune nodes in path to best leaf
+- Prune aggressively if approaching context limits
+
+**Termination:**
+- max_score > 9.5, OR
+- depth > 3, OR
+- synthesis complete
+
+### Context Management Strategy
+
+**Problem:** Main Claude context overload with 80+ node findings
+
+**Solution:**
+```
+Main Claude ONLY holds:
+- graph_state.json (~5KB metadata: node IDs, scores, edges, frontier)
+- orchestration_doc.md (~2KB: topic, user reqs, strategy)
+- current iteration plan (~1KB: what to spawn next)
+
+Total active memory: ~8KB
+
+Node content stored in files:
+- /RESEARCH/[topic]/nodes/n1.md (findings + citations)
+- /RESEARCH/[topic]/nodes/n2.md
+- ...
+- /RESEARCH/[topic]/nodes/n20.md
+
+Agents read files when needed:
+- CoDSynthesizer: Read(n6.md, n8.md, n10.md) - only nodes to merge
+- SAFEVerifier: Read(synthesis.md)
+- ReportFinalizer: Read(synthesis.md) + graph_state.json for sources
+```
+
+Main Claude NEVER loads all node contents into context. Only metadata.
 
 ### Execution Flow
 
 ```
 User: "Deep research [topic]"
          ↓
-research-controller activates
+Main Claude → Task(research-planner, topic)
          ↓
-research-planner creates strategy
+Planner returns: {questions, angles[8-25], iteration_strategy}
          ↓
-User approves plan
+Main Claude → AskUserQuestion(questions)
          ↓
-┌────────┴────────┐
-↓                 ↓
-Iteration 1:    Iteration 2:
-Generate(3)     Generate/Refine
-         ↓                 ↓
-         └────────┬────────┘
-                  ↓
-         cod-synthesizer (Aggregate)
-                  ↓
-         safe-verifier (95%+ accuracy)
-                  ↓
-         report-finalizer
-                  ↓
-      Complete Report in /RESEARCH/[topic]/
+Main Claude creates: ORCHESTRATION.md + graph_state_0.json
+         ↓
+┌────────────────────────────────────────┐
+│ ITERATION 1: Exploration               │
+│ Main Claude spawns 5-10 agents         │
+│ (multi-angle-researcher, parallel)     │
+└────────────────────────────────────────┘
+         ↓
+Update graph → Prune → Check termination
+         ↓
+┌────────────────────────────────────────┐
+│ ITERATION 2: Deepen + Explore          │
+│ Main Claude spawns 6-12 agents         │
+│ (mix: deepen best + new angles)        │
+└────────────────────────────────────────┘
+         ↓
+Update graph → Prune → Check termination
+         ↓
+┌────────────────────────────────────────┐
+│ ITERATION 3: Aggregate                 │
+│ Main Claude → Task(cod-synthesizer)    │
+└────────────────────────────────────────┘
+         ↓
+┌────────────────────────────────────────┐
+│ VERIFICATION                            │
+│ Main Claude → Task(safe-verifier)      │
+└────────────────────────────────────────┘
+         ↓
+┌────────────────────────────────────────┐
+│ FINALIZATION                            │
+│ Main Claude → Task(report-finalizer)   │
+└────────────────────────────────────────┘
+         ↓
+Complete Report in /RESEARCH/[topic]/
 ```
 
-### Agent Location
+### Agent Files Location
 
-All agent prompts, logic, and domain knowledge are self-contained in:
 ```
 .claude/agents/
-├── research-controller.md
-├── Planner.md
-├── MultiAngleResearcher.md
-├── CoDSynthesizer.md
-├── SAFEVerifier.md
-└── ReportFinalizer.md
+├── Planner.md (research-planner)
+├── MultiAngleResearcher.md (multi-angle-researcher)
+├── CoDSynthesizer.md (cod-synthesizer)
+├── SAFEVerifier.md (safe-verifier)
+└── ReportFinalizer.md (report-finalizer)
 ```
 
-**No setup required** - agents are automatically available and will be invoked by the research-controller based on GoT strategy.
+**No setup required** - agents are automatically available for Main Claude to deploy.
+
+Research outputs will be saved to `RESEARCH/[topic]/` when you run deep research.

@@ -190,10 +190,10 @@ High-fidelity SpCas9 variants (HF1, eSpCas9) reduce off-target effects by 87-95%
 
 ### Integration Points
 
-- **GoT Controller**: Receives aggregated thought and score for graph update
-- **Generate Agents**: Provide input thoughts to be aggregated
-- **Refine Agent**: May improve aggregated output if score is suboptimal
-- **CoVe Validator**: Cross-checks aggregated claims for verification
+- **Main Claude Code**: Invokes this agent when 5-7 high-scoring nodes exist, receives synthesis + score for graph update
+- **multi-angle-researcher agents**: Provide input nodes (findings) to be aggregated
+- **safe-verifier**: Validates synthesized claims after aggregation
+- **report-finalizer**: Uses verified synthesis to create final deliverables
 
 **Reference Standards:**
 - Adams et al. (2023): "From Sparse to Dense: GPT-4 Summarization with Chain of Density Prompting"

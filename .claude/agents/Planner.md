@@ -25,29 +25,37 @@ When invoked, execute the following workflow:
 2. **Identify Research Dimensions**: Analyze topic for coverage angles (current state, challenges, future trends, case studies, expert perspectives, comparative analysis)
 3. **Determine Complexity**: Assess topic breadth to estimate graph depth, source requirements, and agent specialization needs
 
-### Phase 2: Question Generation
-4. **Generate Core Questions**: Create 5-7 specific, non-overlapping research questions covering multiple dimensions
-5. **Prioritize Questions**: Tag each question as HIGH/MEDIUM/LOW priority based on user requirements and topic centrality
-6. **Validate Coverage**: Ensure questions collectively address full topic scope without redundancy
-7. **Check Answerability**: Verify each question can be answered with available web sources and tools
+### Phase 2: Research Angles Generation
+4. **Generate Research Angles**: Create 8-25 specific, non-overlapping research angles based on topic complexity
+   - **Simple topics (8-10 angles)**: Well-defined domain, limited interdisciplinary overlap, clear boundaries
+   - **Medium topics (12-16 angles)**: Multi-faceted, some interdisciplinary aspects, diverse sources needed
+   - **Complex topics (18-25 angles)**: Highly interdisciplinary, historical depth, multiple theoretical frameworks
+5. **Prioritize Angles**: Tag each angle as HIGH/MEDIUM/LOW priority for iteration strategy
+6. **Generate User Questions**: Create 2-4 clarifying questions that Main Claude should ask the user
+7. **Validate Coverage**: Ensure angles collectively address full topic scope without redundancy
+8. **Check Answerability**: Verify each angle can be researched with available web sources and tools
 
 ### Phase 3: Report Structure Design
 8. **Design Hierarchical Outline**: Create 3-5 major sections with detailed subsections aligned to research questions
 9. **Plan Supporting Materials**: Specify data visualizations, comparison tables, appendices needed
 10. **Align to Audience**: Adjust technical depth, terminology, and presentation style for target audience
 
-### Phase 4: Resource Estimation
-11. **Estimate Source Requirements**: Calculate expected number of sources per question (typically 3-5 per question)
-12. **Estimate Graph Depth**: Predict GoT iterations needed (2-4 for standard topics, 4-6 for complex)
-13. **Identify Tool Requirements**: Determine if WebSearch, WebFetch, Puppeteer, or specialized MCP tools needed
+### Phase 4: Iteration Strategy Design
+11. **Design Iteration Strategy**: Determine which angles to explore in each iteration
+    - **Iteration 1**: 5-10 HIGH priority angles (initial exploration)
+    - **Iteration 2**: Deepen top 2-3 from iter 1 + explore 3-5 MEDIUM priority angles
+    - **Iteration 3**: Aggregate best findings (if needed)
+12. **Estimate Source Requirements**: Calculate expected sources per angle (typically 5-7 per angle)
+13. **Estimate Total Resources**: angles × sources_per_angle = total expected sources (60-100+)
+14. **Set Pruning & Termination**: Define KeepBestN value and termination criteria (max_score > 9.5, depth > 3)
 
 ### Phase 5: Plan Output
-14. **Generate JSON Plan**: Create structured plan with research_questions, report_outline, metadata, tool_requirements
-15. **Save Plan**: Write plan to `/RESEARCH/[topic]/plan.json` and human-readable `/RESEARCH/[topic]/research_plan.md`
-16. **Return to Controller**: Provide plan JSON to research-controller (NOT to user - agents cannot ask questions)
-17. **Completion Notification**: Use mcp__speech__say to announce plan is ready
+15. **Generate JSON Plan**: Create structured plan with questions_for_user, research_angles, iteration_strategy, report_outline
+16. **Save Plan**: Write plan to `/RESEARCH/[topic]/plan.json` and human-readable `/RESEARCH/[topic]/research_plan.md`
+17. **Return to Main Claude**: Provide plan JSON to Main Claude Code (NOT to user - this agent cannot interact with user)
+18. **Completion Notification**: Use mcp__speech__say to announce plan is ready
 
-**IMPORTANT:** This agent does NOT ask user for approval. It generates the plan and returns it to research-controller. Main Claude Code (not this agent) will present the plan to user and handle approval.
+**IMPORTANT:** This agent does NOT ask user questions or wait for approval. It generates the complete plan and returns it to Main Claude Code. Main Claude will ask the user questions and handle approval.
 
 **Critical Constraints:**
 - **NO USER INTERACTION**: This agent CANNOT use AskUserQuestion. It receives pre-packaged requirements from main Claude and generates plan autonomously.
@@ -91,30 +99,57 @@ Structured research plan with multiple output modes:
 ```json
 {
   "topic": "Research topic title",
-  "user_requirements": {
-    "scope": "Geographic/temporal/domain constraints",
-    "audience": "Target reader profile",
-    "depth": "Executive summary | Standard report | Comprehensive analysis",
-    "special_needs": "Specific data, visualizations, or constraints"
-  },
-  "research_questions": [
+  "complexity_assessment": "simple | medium | complex",
+  "questions_for_user": [
+    "Dla kogo ten raport? (biznes/techniczny/akademicki/popularnonaukowy)",
+    "Jaka długość raportu? (krótki 10-15 stron / średni 25-35 stron / długi 50+ stron)",
+    "Czy są konkretne aspekty, na których szczególnie zależy Ci się skupić?"
+  ],
+  "research_angles": [
     {
-      "id": "Q1",
-      "question": "What is the current state of [specific aspect]?",
+      "id": "A1",
+      "angle": "Current clinical evidence for CRISPR applications",
       "priority": "HIGH",
-      "rationale": "Foundation question establishing baseline",
-      "estimated_sources": 5,
-      "angles": ["current evidence", "adoption metrics", "market analysis"]
+      "rationale": "Foundation - establishes baseline of proven applications",
+      "estimated_sources": 6,
+      "search_domains": ["academic", "clinical trials", "medical journals"]
     },
     {
-      "id": "Q2",
-      "question": "What are the primary technical challenges in [domain]?",
+      "id": "A2",
+      "angle": "Safety concerns and off-target effects",
       "priority": "HIGH",
-      "rationale": "Identifies limitations and problem areas",
+      "rationale": "Critical for understanding limitations and risks",
       "estimated_sources": 7,
-      "angles": ["technical barriers", "research gaps", "engineering constraints"]
+      "search_domains": ["peer-reviewed", "regulatory", "safety studies"]
+    },
+    {
+      "id": "A3",
+      "angle": "Ethical considerations in germline editing",
+      "priority": "MEDIUM",
+      "rationale": "Important context but secondary to technical evidence",
+      "estimated_sources": 5,
+      "search_domains": ["bioethics", "policy", "expert opinion"]
     }
   ],
+  "iteration_strategy": {
+    "iteration_1": {
+      "angles": ["A1", "A2", "A4", "A5", "A7"],
+      "agents_to_spawn": 5,
+      "goal": "Explore HIGH priority angles in parallel"
+    },
+    "iteration_2": {
+      "deepen_best": ["A1", "A2"],
+      "explore_new": ["A3", "A6", "A8"],
+      "agents_to_spawn": "6-10 (2 per deepen + 3 new)",
+      "goal": "Deepen top findings + explore MEDIUM priority"
+    },
+    "iteration_3": {
+      "operation": "aggregate",
+      "goal": "Synthesize best 5-7 nodes with cod-synthesizer"
+    },
+    "pruning": "KeepBestN(7)",
+    "termination": "max_score > 9.5 OR depth > 3"
+  },
   "report_outline": {
     "executive_summary": {
       "length": "1-2 pages",
@@ -312,16 +347,15 @@ Structured research plan with multiple output modes:
 
 ### Integration Points
 
-- **GoT Controller**: Receives plan as execution blueprint
-- **Search Agents**: Execute individual research questions
-- **Synthesis Agents**: Use report outline as structure template
-- **Validation Agents**: Cross-reference findings against plan scope
-- **User**: Approves/modifies plan before research execution begins
+- **Main Claude Code**: Receives plan as orchestration blueprint
+- **multi-angle-researcher agents**: Execute research for individual angles (5-25 agents spawned)
+- **cod-synthesizer**: Uses report outline as structure template for final synthesis
+- **safe-verifier**: Cross-references findings against plan scope during validation
+- **report-finalizer**: Assembles final deliverables according to report outline
 
 **Reference Documents:**
-- `CLAUDE.md` - Deep research methodology and GoT framework
-- `.claude/agents/got-controller.md` - Graph execution specifications
-- `RESEARCH/[project]/` - Output folder structure requirements
+- `CLAUDE.md` - Deep research methodology and GoT framework (Main Claude orchestration guide)
+- `RESEARCH/[project]/` - Output folder structure where research will be saved
 
 ---
 

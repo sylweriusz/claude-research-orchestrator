@@ -294,10 +294,10 @@ Avoid confirmation bias by:
 - Used when standard mode finds contradictions
 
 ### Integration Points
-- **Multi-Angle Researcher**: Provides initial sources that SAFE verifies
-- **CoD Synthesizer**: Receives verified claims for final aggregation
-- **Report Finalizer**: Uses SAFE output to ensure citation accuracy
-- **Research Controller**: Calls SAFE before finalizing GoT best path
+- **cod-synthesizer**: Provides synthesis to be verified (after Iteration 3 aggregation)
+- **Main Claude Code**: Invokes this agent after synthesis complete, receives verification results (pass rate, flagged claims)
+- **report-finalizer**: Uses verified synthesis (with any corrections applied) to create final deliverables
+- **multi-angle-researcher nodes**: Original sources available in graph state for cross-referencing
 
 **Reference Documents:**
 - `/RESEARCH/[topic]/graph_state.json` - Track which nodes were verified

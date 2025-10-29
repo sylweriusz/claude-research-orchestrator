@@ -1,150 +1,178 @@
-# Claude Research Orchestrator
-
-> Multi-agent research system powered by Graph of Thoughts architecture and Claude Code
+# Deep Research System - Graph of Thoughts Implementation
 
 ## Quick Start
 
-```bash
+```
 Deep research [your topic]
 ```
 
-The orchestrator will:
-1. Ask 2-3 clarifying questions to understand your needs
-2. Generate a comprehensive research report in 30-45 minutes
-3. Save all outputs to `/RESEARCH/[topic]/`
+That's it! The system will:
+1. Ask you 2-4 clarifying questions
+2. Generate a comprehensive research report in 25-50 minutes
+3. Save everything to `/RESEARCH/[topic]/`
 
 ## What You Get
 
-- **Executive Summary** (1-2 pages) - Key findings and actionable insights
-- **Full Research Report** (20-30 pages) - Comprehensive analysis with citations
-- **Complete Bibliography** - All sources with quality ratings (A-E scale)
-- **Verification Checklist** - 95%+ claim accuracy validation
-- **Methodology Documentation** - Complete audit trail of research process
+- Executive summary (2-3 pages)
+- Full research report (25-35 pages)
+- Academic essay (peer-review format)
+- Interactive HTML visualization
+- Complete bibliography with A-E source quality ratings
+- 60-100+ sources (organic, no duplicates)
+- 95%+ claim verification rate
 
-## System Architecture
+## System Components
 
-### Required Files
-```
-CLAUDE.md                          # Main orchestration instructions
-.claude/agents/                    # 6 specialized research agents
-  ├── research-controller          # Master orchestrator
-  ├── research-planner             # Research strategy design
-  ├── multi-angle-researcher       # Multi-source data gathering
-  ├── cod-synthesizer              # Chain-of-Density summarization
-  ├── safe-verifier                # Fact-checking & validation
-  └── report-finalizer             # Document formatting & polish
-```
+### Active Files (Required)
+- `CLAUDE.md` - Main orchestration instructions (for Main Claude)
+- `.claude/agents/` - 5 specialized research agents
+  - research-planner (strategy & question generation)
+  - multi-angle-researcher (source gathering, 8-25 angles)
+  - cod-synthesizer (Chain-of-Density synthesis)
+  - safe-verifier (fact-checking)
+  - report-finalizer (formatting & deliverables)
+- `RESEARCH/` - Empty folder where research outputs will be saved
 
 ## How It Works
 
-**From User Perspective:**
-- **Input:** Research topic + optional preferences
-- **Output:** Publication-ready research report
-- **Hidden Complexity:** Graph of Thoughts orchestration with 6 specialized agents
+**Black Box Simplicity:**
+- Input: Topic
+- Questions: Main Claude asks 2-4 clarifying questions
+- Output: Complete research package
+- Hidden: Graph of Thoughts orchestration with 5 specialized agents
 
-**Technical Foundation:**
-- **Graph of Thoughts (GoT):** Non-linear reasoning framework
-- **Chain-of-Density (CoD):** Progressive summarization technique
-- **SAFE Protocol:** Search-Augmented Factuality Evaluation
-- **Multi-Source Strategy:** Web + Academic + Technical documentation
+**Under the Hood:**
+- **Main Claude Code orchestrates** (no controller agent)
+- Graph of Thoughts (GoT) framework with scoring & pruning
+- Chain-of-Density (CoD) summarization (5 iterations)
+- Search-Augmented Factuality Evaluation (SAFE)
+- Multi-angle sourcing with adaptive granularity (8-25 angles)
+- Massive parallelization (5-12 agents per iteration)
+
+## Architecture
+
+```
+User: "Deep research [topic]"
+         ↓
+Main Claude → Task(research-planner)
+         ↓
+Planner returns: questions + angles[8-25] + iteration_strategy
+         ↓
+Main Claude → AskUserQuestion
+         ↓
+Main Claude orchestrates 2-3 GoT iterations:
+  - Iteration 1: 5-10 agents (parallel)
+  - Iteration 2: 6-12 agents (deepen + explore)
+  - Iteration 3: Aggregate best findings
+         ↓
+Main Claude → Verify → Finalize
+         ↓
+Complete Report (60-100+ sources)
+```
 
 ## Portability
 
-Zero configuration required. Copy these files to any Claude Code project:
-
-```bash
+Copy these files to any project:
+```
 CLAUDE.md
 .claude/agents/
 ```
 
-The system is completely self-contained and works out of the box.
+No configuration needed. System is completely self-contained.
 
-## Usage Examples
+## Example Usage
 
-### Basic Research
-```bash
-Deep research CRISPR gene editing safety protocols
+### Minimal
+```
+Deep research CRISPR gene editing safety
 ```
 
-### Advanced Research with Preferences
-```bash
-Deep research: AI applications in medical diagnostics
+Main Claude will ask you questions and handle the rest.
 
-Target audience: Healthcare executives
-Depth: Comprehensive (25-30 pages)
-Requirements: Case studies, ROI analysis, regulatory landscape
-```
+### What Main Claude Will Ask
+- Audience (business/technical/academic/interdisciplinary)
+- Length (short 10-15 pages / medium 25-35 / comprehensive 50+)
+- Specific aspects or focus areas
+- Source preferences (if applicable)
 
 ## Output Structure
 
 ```
 RESEARCH/[topic]/
-├── README.md                      # Research overview
-├── executive_summary.md           # High-level findings
-├── full_report.md                 # Complete analysis
+├── ORCHESTRATION.md (research strategy)
+├── executive_summary.md
+├── full_report.md (25-35 pages, popular science)
+├── academic_essay.md (peer-review format)
+├── interactive_report.html (visualization)
+├── nodes/
+│   ├── n1.md (findings from iteration 1)
+│   ├── n2.md
+│   └── ... (15-25 nodes)
 ├── sources/
-│   ├── bibliography.md            # All sources cited
-│   └── source_quality_table.md    # Quality assessment
-└── appendices/
-    ├── methodology.md             # Research approach
-    └── verification_checklist.md  # Validation results
+│   ├── bibliography.md
+│   └── source_quality_table.md (A-E ratings)
+├── graph_state_0.json
+├── graph_state_1.json
+└── graph_state_N.json (final)
 ```
 
-## Technical Details
+## Quality Standards
 
-**Framework:** Graph of Thoughts (GoT)
-- Non-linear reasoning paths
-- Parallel agent execution
-- State-based orchestration
+- ✅ **60-100+ sources** (adaptive based on topic complexity)
+- ✅ **95%+ claim verification rate** (SAFE methodology)
+- ✅ **Sentence-level citations** (Author, Year, "Title", URL)
+- ✅ **A-E source quality ratings** (peer-reviewed → blogs)
+- ✅ **Multi-source corroboration** (claims validated across sources)
+- ✅ **Complete audit trail** (graph states show reasoning)
+- ✅ **Context management** (Main Claude holds only metadata, not full content)
 
-**Agents:** 6 specialized roles
-- Controller: Master orchestration
-- Planner: Research design
-- Researcher: Multi-angle sourcing
-- Synthesizer: CoD summarization
-- Verifier: SAFE fact-checking
-- Finalizer: Document production
+## Performance
 
-**Validation:** Search-Augmented Factuality Evaluation
-- Claim extraction
-- Source verification
-- Multi-source corroboration
-- Confidence scoring
+- Planning: 2-3 min
+- Iteration 1: 5-10 min (5-10 agents parallel)
+- Iteration 2: 5-10 min (6-12 agents parallel)
+- Iteration 3: 3-5 min (synthesis)
+- Verification: 5-7 min
+- Finalization: 5-8 min
+- **Total: 25-50 minutes**
 
-## Version Information
+## Key Features
 
-- **Version:** 1.0.0
-- **Release Date:** 2025-10-29
-- **Framework:** GoT + CoD + SAFE
-- **Agent Count:** 6
-- **Status:** Production Ready ✅
+### Adaptive Granularity
+- **Simple topics**: 8-10 research angles
+- **Medium topics**: 12-16 research angles
+- **Complex topics**: 18-25 research angles
+- Planner decides based on interdisciplinary nature and depth required
 
-## Repository Structure
+### Massive Parallel Sourcing
+- Each angle = 1 agent
+- Each agent = 6 sources
+- Example: 15 angles × 6 sources = **90 sources** (in ~10 min via parallelization)
 
-```
-claude-research-orchestrator/
-├── CLAUDE.md                      # Main system prompt
-├── .claude/
-│   └── agents/                    # 6 specialized agents
-├── RESEARCH/                      # Generated reports (gitignored)
-├── research_template_oldies/      # Development documentation
-└── README.md                      # This file
-```
+### Context Management
+- Main Claude holds only metadata (~8KB)
+- Node content saved to files
+- No context overload even with 80+ findings
 
-## Requirements
+### Graph of Thoughts
+- Multiple parallel exploration paths
+- Quality-based pruning (KeepBestN(7))
+- Adaptive iteration depth (2-3 iterations)
+- Transparent reasoning traces
 
-- Claude Code CLI
-- Internet connection (for web research)
-- ~30-55 minutes per research session
+## Version
 
-## License
+**Version:** 2.0 (Simplified Architecture)
+**Updated:** 2025-10-29
+**Framework:** Graph of Thoughts + Chain-of-Density + SAFE
+**Total Agents:** 5 (Main Claude orchestrates)
+**Status:** ✅ Production Ready
 
-MIT
+## Changelog from v1.0
 
-## Acknowledgments
-
-Built on research in:
-- Graph of Thoughts reasoning frameworks
-- Chain-of-Density summarization
-- Search-Augmented Factuality Evaluation
-- Multi-agent orchestration systems
+- ❌ Removed: research-controller agent (over-engineered)
+- ✅ Simplified: Main Claude orchestrates directly
+- ✅ Enhanced: Adaptive angle granularity (8-25 based on complexity)
+- ✅ Enhanced: Context management strategy (files, not memory)
+- ✅ Enhanced: 60-100+ sources (vs 15-30 in v1.0)
+- ✅ Fixed: Question-asking protocol (only Main Claude can ask)
