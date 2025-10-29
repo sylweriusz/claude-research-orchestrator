@@ -2,6 +2,18 @@
 
 ## Quick Start
 
+### Installation
+
+```bash
+git clone https://github.com/sylweriusz/claude-research-orchestrator.git
+cd claude-research-orchestrator
+
+# Launch Claude Code with permission bypass (sandbox mode)
+claude --dangerously-skip-permissions
+```
+
+### Usage
+
 ```
 Deep research [your topic]
 ```
@@ -10,6 +22,15 @@ That's it! The system will:
 1. Ask you 2-4 clarifying questions
 2. Generate a comprehensive research report in 25-50 minutes
 3. Save everything to `/RESEARCH/[topic]/`
+
+### About Permission Mode
+
+The `--dangerously-skip-permissions` flag enables autonomous agent operation:
+- Agents execute file operations without manual approval
+- Web searches and tool calls proceed automatically
+- Required for parallel agent orchestration (5-12 concurrent agents)
+
+**Security:** This flag bypasses permission checks. Use only in trusted directories or sandboxed environments.
 
 ## What You Get
 
