@@ -74,9 +74,16 @@ When invoked, execute the following workflow:
     - Proper Markdown formatting
     - Table of contents with section links
 14. **Honor User Requirements**: Apply specific formatting, tone, length constraints from user specification
+15. **Apply Language Localization** (if report_language ≠ "en"):
+    - Translate all deliverable content (full_report, executive_summary, academic_essay) to target language
+    - Preserve citation format: Keep source titles in original language (academic standard)
+    - Technical terms: Provide target language equivalents with English in parentheses on first use
+    - Interactive HTML: Translate UI labels, headings, descriptions
+    - Quality: Natural, fluent translation appropriate for target audience
+    - **Note:** Synthesis and intermediate artifacts (_process/) remain in English for system consistency
 
 ### Phase 6: Interactive Visualization & Academic Essay
-15. **Generate Interactive HTML Report**: Create `interactive_report.html` with:
+16. **Generate Interactive HTML Report**: Create `interactive_report.html` with:
     - Responsive design with modern CSS (gradients, animations, cards)
     - Visual timeline (color-coded by category/lineage)
     - Key findings in highlight boxes
@@ -90,7 +97,7 @@ When invoked, execute the following workflow:
     - Self-contained single HTML file with embedded CSS
     - Target: Accessible to broad audience, visual learners
 
-16. **Generate Academic Essay**: Create `academic_essay.md` with:
+17. **Generate Academic Essay**: Create `academic_essay.md` with:
     - Peer-review paper structure (Abstract, Introduction, numbered sections, Discussion, Conclusion, References)
     - Hierarchical organization with clear section numbering
     - **Evidence hierarchy integrated in prose** (NOT badges), examples:
@@ -105,11 +112,15 @@ When invoked, execute the following workflow:
     - Target: Academic peer review, scholarly publication
 
 ### Phase 7: Structured Output & Notification
-17. **Create Folder Structure**: Set up `/RESEARCH/{topic}/` with organized files
-18. **Save All Documents**: Write final report, executive summary, bibliography, metadata, HTML, academic essay
-19. **Return Manifest Only**: JSON with deliverables list, file sizes, corrections applied (max 500 bytes)
-20. **Completion Notification**: Use `mcp__speech__say` with context-specific message:
-    - Example: `mcp__speech__say("Research complete - delivered popular science report, interactive HTML visualization, academic essay, ninety-three citations, and source quality assessment")`
+18. **Create Folder Structure**: Set up `/RESEARCH/{topic}/` with organized files
+19. **Save All Documents**: Write final report, executive summary, bibliography, metadata, HTML, academic essay
+20. **Return Manifest Only**: JSON with deliverables list, file sizes, corrections applied (max 500 bytes)
+21. **Completion Notification**: Use `mcp__speech__say` with context-specific message:
+    - **If report_language is English**: Use English notification
+    - **Otherwise**: Translate notification to report_language (natural speech)
+    - Example (English): "Research complete - delivered popular science report, interactive HTML visualization, academic essay, ninety-three citations, and source quality assessment"
+    - Example (German): "Forschung abgeschlossen - populärwissenschaftlicher Bericht, interaktive HTML Visualisierung, akademischer Essay, dreiundneunzig Zitierungen und Quellenqualitätsbewertung geliefert"
+    - Example (Polish): "Badania zakończone - dostarczono raport popularnonaukowy, interaktywną wizualizację HTML, esej akademicki, dziewięćdziesiąt trzy cytowania i ocenę jakości źródeł"
 
 **Critical Constraints:**
 - NEVER include unsourced claims (flag for SAFE re-verification if found)
@@ -157,6 +168,8 @@ When invoked, execute the following workflow:
 - `synthesis_file_path`: Verified synthesis to finalize (e.g., "_process/synthesis.md")
 - `verification_file_path`: Verification report (e.g., "_process/verification_report.md")
 - `output_directory`: Base directory for deliverables (e.g., "RESEARCH/topic/")
+- `report_language`: [ISO code, e.g., "pl", "de", "es", "en"] - target language for deliverables
+- `topic_language`: [ISO code] - for context
 
 **Agent Actions:**
 1. Read synthesis + verification from files

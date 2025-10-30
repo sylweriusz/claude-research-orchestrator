@@ -21,6 +21,7 @@ Applies Chain-of-Density (CoD) summarization algorithm to merge multiple researc
 **Input (from Main Claude):**
 - `node_file_paths`: Array of node files to merge (e.g., ["_process/nodes/n1.md", "_process/nodes/n3.md", "_process/nodes/n7.md"])
 - `output_file_path`: Where to write synthesis (e.g., "_process/synthesis.md")
+- `topic_language`: [ISO code] - for context (synthesis stays in English)
 
 When invoked, execute the following workflow:
 
@@ -32,7 +33,8 @@ When invoked, execute the following workflow:
 5. **Calculate Target Length**: Determine optimal summary length (typically 300-500 words)
 
 ### Phase 2: Chain-of-Density Execution (5 Iterations)
-5. **Iteration 1 - Verbose Baseline**: Create initial summary with basic structure, low entity density (~80 words if target is 400)
+5. **Iteration 1 - Verbose Baseline**: Create initial summary in **English** with basic structure, low entity density (~80 words if target is 400)
+   - Note: Translation to target language happens in finalization
 6. **Iteration 2 - Add Missing Entities**: Identify 1-3 informative entities missing from Iteration 1, rewrite to include them while maintaining length
 7. **Iteration 3 - Compress & Fuse**: Add 1-3 more missing entities, compress existing content to make room, same length maintained
 8. **Iteration 4 - Increase Density**: Add 1-3 more missing entities, aggressive compression of verbose phrases, same length

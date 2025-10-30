@@ -210,6 +210,7 @@ RESEARCH/[topic]/
 - ✅ Replaced: research-planner agent → inline planning (faster, no agent overhead)
 - ✅ Enhanced: User approval step (shows all angles + priorities before execution)
 - ✅ Enhanced: Targeted Iteration 2 strategy (resolve contradictions, verify claims, deepen validated)
+- ✅ Added: Multilingual support (auto-detect topic language, deliver reports in English or detected language)
 
 ### v2.0 (2025-10-29)
 - ❌ Removed: research-controller agent (over-engineered)

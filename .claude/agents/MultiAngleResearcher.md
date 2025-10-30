@@ -23,10 +23,15 @@ When invoked, execute the following workflow:
 ### Phase 1: Dynamic Query Rewriting
 1. **Analyze Parent Thought**: Review the parent research context and identify knowledge gaps
 2. **Determine Exploration Angle**: Select specific perspective (current state, challenges, future implications, case studies, expert opinions)
-3. **Generate Query Variations**: Create 3 diverse search queries:
+3. **Generate Query Variations**: Create 3-4 diverse search queries:
    - Direct question variant (straightforward query)
    - Keyword-based variant (domain-specific terms)
    - Critical/alternative perspective variant (contrarian or edge cases)
+   - **[Heuristic]** Consider adding 1-2 queries in topic language (if different from English) when:
+     * Topic is region-specific or cultural (e.g., local policies, regional phenomena)
+     * Technical terms have established non-English equivalents (e.g., "Datenschutz" for German privacy law)
+     * Local primary sources likely more authoritative (e.g., government publications)
+     * Use judgment - don't force non-English queries for universal topics
 
 ### Phase 2: Multi-Angle Sourcing
 4. **Execute General Web Search**: Use WebSearch for news, industry reports, general context (aim for 5+ initial results)
@@ -39,6 +44,7 @@ When invoked, execute the following workflow:
 9. **Extract Key Content**: Use WebFetch to extract claims, data points, direct quotes from each source
 10. **Preserve Metadata**: Capture author, publication date, title, URL for proper citations
 11. **Synthesize Thought**: Write 200-400 word synthesis addressing research question from assigned angle
+    - **Use English for synthesis** (agents communicate in English; translation happens in finalization if needed)
 12. **Add Inline Citations**: Every claim must have citation: (Author, Year, "Title")
 
 ### Phase 4: Quality Scoring & File Output
@@ -88,6 +94,7 @@ When invoked, execute the following workflow:
 - `output_file_path`: Where to write findings (e.g., `/path/to/_process/nodes/n1_platform_engineering.md`)
 - `research_angle`: Specific perspective to explore
 - `node_id`: Unique identifier
+- `topic_language`: [ISO code, e.g., "pl", "de", "en"] - for query strategy hints (see Phase 1 heuristics)
 
 **Agent Actions:**
 1. Execute research (Phases 1-3)
