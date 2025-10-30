@@ -323,10 +323,7 @@ When a user requests deep research with **"Deep research [topic]"**, Main Claude
 - Target: 95%+ pass rate
 
 **6. report-finalizer** (Final Assembly)
-- Reads synthesis + verification report files
-- Writes all deliverables to files (report, summary, HTML, essay, bibliography)
-- Returns manifest with file list only
-- Embeds sentence-level citations in all outputs
+- See detailed invocation contract in "Finalization Phase: report-finalizer" section below
 
 ### Agent I/O Protocol
 
@@ -428,6 +425,75 @@ Main Claude:
 3. CoDSynthesizer reads files, writes synthesis, returns: {file_path, score: 9.6}
 4. Update _process/graph_state_3.json with synthesis metadata
 5. → Proceed to Verification
+```
+
+**Verification Phase: safe-verifier**
+```
+Main Claude:
+1. Spawn safe-verifier with:
+   - synthesis_file_path: /RESEARCH/[topic]/_process/synthesis.md
+   - output_file_path: /RESEARCH/[topic]/_process/verification_report.md
+2. Agent extracts atomic claims, validates via adversarial WebSearch
+3. Returns verification metadata: {total_claims, verified_claims, verification_rate, critical_fixes_needed}
+4. IF verification_rate < 95% → abort or fix critical issues
+5. → Proceed to Finalization
+```
+
+**Finalization Phase: report-finalizer**
+
+**When to invoke:** After SAFE verification completes with ≥95% pass rate
+
+**Input Parameters:**
+```
+- synthesis_file_path: /RESEARCH/[topic]/_process/synthesis.md
+- verification_file_path: /RESEARCH/[topic]/_process/verification_report.md
+- graph_state_file_path: /RESEARCH/[topic]/_process/graph_state_N.json
+- orchestration_file_path: /RESEARCH/[topic]/_process/ORCHESTRATION.md
+- output_directory: /RESEARCH/[topic]/
+- report_language: ISO code from ORCHESTRATION.md (e.g., "pl", "de", "en")
+- topic_language: ISO code from ORCHESTRATION.md
+```
+
+**Expected Output:**
+JSON manifest (~500 bytes max) listing generated deliverables:
+```json
+{
+  "deliverables": [
+    {"file": "executive_summary.md", "size_kb": 18, "type": "summary"},
+    {"file": "full_report.md", "size_kb": 85, "type": "report"},
+    {"file": "interactive_report.html", "size_kb": 42, "type": "visualization"},
+    {"file": "academic_essay.md", "size_kb": 76, "type": "essay"},
+    {"file": "bibliography.md", "size_kb": 45, "type": "bibliography"}
+  ],
+  "corrections_applied": 3
+}
+```
+
+**Agent Responsibility:**
+report-finalizer autonomously reads input files, executes finalization workflow per ReportFinalizer.md instructions, writes all deliverables to output_directory.
+
+**Main Claude Responsibility:**
+Provide file paths, invoke agent with minimal prompt, receive manifest, verify deliverables exist.
+
+**Invocation Example:**
+```
+Task(
+  subagent_type="report-finalizer",
+  prompt=f"""Generate all deliverables for research topic.
+
+Input files:
+- synthesis_file_path: {synthesis_path}
+- verification_file_path: {verification_path}
+- graph_state_file_path: {graph_state_path}
+- orchestration_file_path: {orchestration_path}
+
+Output:
+- output_directory: {output_dir}
+- report_language: {report_language}
+- topic_language: {topic_language}
+
+Execute your standard finalization workflow."""
+)
 ```
 
 **Pruning Rules:**

@@ -16,6 +16,46 @@ Transforms verified research findings from Graph of Thoughts nodes into polished
 
 ---
 
+## Input/Output Contract
+
+### Parameters Received from Main Claude
+
+Main Claude provides these parameters in the invocation prompt:
+
+**Required Inputs:**
+- `synthesis_file_path`: Path to verified synthesis (e.g., "_process/synthesis.md")
+- `verification_file_path`: Path to SAFE verification report (e.g., "_process/verification_report.md")
+- `graph_state_file_path`: Path to latest graph state JSON (e.g., "_process/graph_state_2.json")
+- `orchestration_file_path`: Path to user requirements and strategy (e.g., "_process/ORCHESTRATION.md")
+- `output_directory`: Base directory for all deliverables (e.g., "/RESEARCH/topic/")
+- `report_language`: Target language ISO code for deliverables (e.g., "pl", "de", "es", "en")
+- `topic_language`: Source topic language ISO code (for context)
+
+### Expected Output
+
+Return **JSON manifest only** (max 500 bytes):
+```json
+{
+  "deliverables": [
+    {"file": "executive_summary.md", "size_kb": 18, "type": "summary"},
+    {"file": "full_report.md", "size_kb": 85, "type": "report"},
+    {"file": "interactive_report.html", "size_kb": 42, "type": "visualization"},
+    {"file": "academic_essay.md", "size_kb": 76, "type": "essay"},
+    {"file": "bibliography.md", "size_kb": 45, "type": "bibliography"}
+  ],
+  "total_files": 5,
+  "corrections_applied": 3
+}
+```
+
+**DO NOT include large text blocks in output** - all content must be written to files in `output_directory`.
+
+### Autonomy
+
+This agent executes the complete finalization workflow using the provided inputs **without requiring additional instructions from Main Claude**. All implementation details are defined in the Instructions section below.
+
+---
+
 ## Instructions
 
 When invoked, execute the following workflow:
