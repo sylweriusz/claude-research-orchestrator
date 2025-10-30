@@ -21,10 +21,10 @@ Transforms verified research findings from Graph of Thoughts nodes into polished
 When invoked, execute the following workflow:
 
 ### Phase 1: Content Assembly & Structure
-1. **Ingest Verified Content**: Read best path nodes from GoT graph state: `/RESEARCH/{topic}/graph_state.json`
-2. **Load Report Outline**: Read approved structure from `/RESEARCH/{topic}/report_outline.md`
-3. **Extract Verified Claims**: Parse SAFE-verified claims from `/RESEARCH/{topic}/verified_claims.json`
-4. **Map Content to Structure**: Align verified nodes to outline sections, ensure logical flow
+1. **Ingest Verified Content**: Read synthesis from `_process/synthesis.md` and verification from `_process/verification_report.md`
+2. **Load Graph State**: Read `_process/graph_state.json` for node metadata and sources
+3. **Load Orchestration**: Read `_process/ORCHESTRATION.md` for user requirements and strategy
+4. **Map Content to Structure**: Organize content into deliverable sections with logical flow
 
 ### Phase 2: Citation Integration
 5. **Embed Inline Citations**: Apply sentence-level citation format for every factual claim:
@@ -154,8 +154,8 @@ When invoked, execute the following workflow:
 ## Output Format
 
 **Input (from Main Claude):**
-- `synthesis_file_path`: Verified synthesis to finalize
-- `verification_file_path`: Verification report
+- `synthesis_file_path`: Verified synthesis to finalize (e.g., "_process/synthesis.md")
+- `verification_file_path`: Verification report (e.g., "_process/verification_report.md")
 - `output_directory`: Base directory for deliverables (e.g., "RESEARCH/topic/")
 
 **Agent Actions:**
@@ -185,7 +185,6 @@ The finalizer produces a structured folder with multiple documents:
 ### File Structure
 ```
 /RESEARCH/{topic}/
-├── README.md (Navigation guide)
 ├── executive_summary.md (1-2 pages)
 ├── full_report.md (Main deliverable - popular science)
 ├── interactive_report.html (Visual presentation - NEW STANDARD)
@@ -289,7 +288,7 @@ Example paragraph:
 
 ## References
 
-See: `/RESEARCH/{topic}/sources/bibliography.md`
+See: `/RESEARCH/{topic}/bibliography.md`
 ```
 
 ### Source Quality Table Template
@@ -421,7 +420,6 @@ Total Sources: [N]
 
 ```
 /RESEARCH/{topic}/
-├── README.md                           # Navigation guide, quick links
 ├── executive_summary.md                # 1-2 page overview
 ├── full_report.md                      # Main comprehensive report
 ├── sources/
@@ -447,7 +445,7 @@ Total Sources: [N]
 **Upstream Dependencies:**
 - **safe-verifier**: Provides verified synthesis and validation pass rate (95%+)
 - **Main Claude Code**: Provides graph state (best path nodes, scores, sources)
-- **research-planner**: Provides approved report outline and user requirements (from ORCHESTRATION.md)
+- **research-planner**: Provides user requirements and strategy (from _process/ORCHESTRATION.md)
 
 **Downstream Consumers:**
 - **End User**: Receives final report package
@@ -455,10 +453,11 @@ Total Sources: [N]
 - **Quality Auditors**: Review verification checklist and methodology
 
 **Reference Documents:**
-- `/RESEARCH/{topic}/graph_state.json` - GoT node content and scores
-- `/RESEARCH/{topic}/verified_claims.json` - SAFE-approved claims
-- `/RESEARCH/{topic}/report_outline.md` - User-approved structure
-- `/RESEARCH/{topic}/user_requirements.md` - Formatting and content specifications
+- `/RESEARCH/{topic}/_process/graph_state.json` - GoT node metadata and scores
+- `/RESEARCH/{topic}/_process/synthesis.md` - Verified synthesis content
+- `/RESEARCH/{topic}/_process/verification_report.md` - SAFE verification results
+- `/RESEARCH/{topic}/_process/ORCHESTRATION.md` - User requirements and strategy
+- `/RESEARCH/{topic}/_process/nodes/` - Individual research node files
 
 ---
 

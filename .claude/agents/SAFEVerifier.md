@@ -19,8 +19,8 @@ Implements Search-Augmented Factuality Evaluation (SAFE) to eliminate hallucinat
 ## Instructions
 
 **Input (from Main Claude):**
-- `synthesis_file_path`: Path to synthesis requiring verification (e.g., "synthesis_final.md")
-- `verification_report_path`: Where to write verification results (e.g., "verification_report.md")
+- `synthesis_file_path`: Path to synthesis requiring verification (e.g., "_process/synthesis.md")
+- `verification_report_path`: Where to write verification results (e.g., "_process/verification_report.md")
 
 When invoked, execute the following workflow:
 
@@ -122,7 +122,7 @@ When invoked, execute the following workflow:
 ```json
 {
   "node_id": "n10",
-  "file_path": "verification_report.md",
+  "file_path": "_process/verification_report.md",
   "total_claims": 87,
   "verified": 71,
   "partially_verified": 10,
@@ -326,8 +326,8 @@ Avoid confirmation bias by:
 - **multi-angle-researcher nodes**: Original sources available in graph state for cross-referencing
 
 **Reference Documents:**
-- `/RESEARCH/[topic]/graph_state.json` - Track which nodes were verified
-- `/RESEARCH/[topic]/sources/bibliography.md` - Cross-reference cited sources
+- `/RESEARCH/[topic]/_process/graph_state.json` - Track which nodes were verified
+- `/RESEARCH/[topic]/bibliography.md` - Cross-reference cited sources (top-level deliverable)
 
 ---
 

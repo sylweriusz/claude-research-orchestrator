@@ -19,8 +19,8 @@ Applies Chain-of-Density (CoD) summarization algorithm to merge multiple researc
 ## Instructions
 
 **Input (from Main Claude):**
-- `node_file_paths`: Array of node files to merge (e.g., ["nodes/n1.md", "nodes/n3.md", "nodes/n7.md"])
-- `output_file_path`: Where to write synthesis (e.g., "synthesis_final.md")
+- `node_file_paths`: Array of node files to merge (e.g., ["_process/nodes/n1.md", "_process/nodes/n3.md", "_process/nodes/n7.md"])
+- `output_file_path`: Where to write synthesis (e.g., "_process/synthesis.md")
 
 When invoked, execute the following workflow:
 
@@ -96,7 +96,7 @@ When invoked, execute the following workflow:
 ```json
 {
   "node_id": "n9",
-  "file_path": "synthesis_final.md",
+  "file_path": "_process/synthesis.md",
   "score": 9.2,
   "operation": "Aggregate(CoD)",
   "parents": ["n1", "n3", "n7"],

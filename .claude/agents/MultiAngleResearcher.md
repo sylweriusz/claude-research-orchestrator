@@ -85,7 +85,7 @@ When invoked, execute the following workflow:
 ## Output Format
 
 **Input (from Main Claude):**
-- `output_file_path`: Where to write findings (e.g., `/path/to/nodes/n1_platform_engineering.md`)
+- `output_file_path`: Where to write findings (e.g., `/path/to/_process/nodes/n1_platform_engineering.md`)
 - `research_angle`: Specific perspective to explore
 - `node_id`: Unique identifier
 
@@ -117,7 +117,7 @@ When invoked, execute the following workflow:
 ```json
 {
   "node_id": "n1",
-  "file_path": "nodes/n1_platform_engineering.md",
+  "file_path": "_process/nodes/n1_platform_engineering.md",
   "score": 8.5,
   "operational_impact": "HIGH",
   "sources_count": 6,
@@ -228,7 +228,7 @@ CRISPR-Cas9 gene editing has achieved 95% reduction in off-target effects throug
 
 **Agent returns:**
 - Metadata JSON only (~300 bytes), NOT full text
-- Main Claude updates graph_state.json with file pointer
+- Main Claude updates _process/graph_state.json with file pointer
 
 **cod-synthesizer:**
 - This agent's output nodes become input for synthesis (when 5-7 high-scoring nodes exist)
@@ -238,9 +238,9 @@ CRISPR-Cas9 gene editing has achieved 95% reduction in off-target effects throug
 - Can collaborate: Share sources if Refine needs additional context
 
 **Reference Documents:**
-- `/RESEARCH/[project]/graph_state.json` - Current GoT state
-- `/RESEARCH/[project]/sources/bibliography.md` - All sources collected
-- `/RESEARCH/[project]/research_notes/` - Agent findings storage
+- `/RESEARCH/[project]/_process/graph_state.json` - Current GoT state
+- `/RESEARCH/[project]/bibliography.md` - All sources collected (top-level deliverable)
+- `/RESEARCH/[project]/_process/nodes/` - Agent findings storage
 
 ---
 
