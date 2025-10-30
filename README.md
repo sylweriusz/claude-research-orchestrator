@@ -19,7 +19,7 @@ Deep research [your topic]
 ```
 
 That's it! The system will:
-1. Ask you 2-4 clarifying questions
+1. Ask you 4-6 clarifying questions
 2. Generate a comprehensive research report in 25-50 minutes
 3. Save everything to `/RESEARCH/[topic]/`
 

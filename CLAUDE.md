@@ -140,7 +140,7 @@ I generate the research plan using a **MECE (Mutually Exclusive, Collectively Ex
 
 This is a **critical step**. I *do not* begin execution before user approval.
 
-1.  **Generate Questions:** I formulate 2-4 clarification questions.
+1.  **Generate Questions:** I formulate 4-6 clarification questions.
     * **Always Ask (2):**
         1.  "Who is this research for? (e.g., a technical expert, a business executive, a general audience)"
         2.  "What is the primary goal? (e.g., a brief overview, a comprehensive deep-dive, a pros/cons comparison)"
