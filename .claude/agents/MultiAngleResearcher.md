@@ -2,7 +2,7 @@
 name: multi-angle-researcher
 description: "research", "source gathering", "multi-angle sourcing", "query rewriting" - USE PROACTIVELY when executing Graph of Thoughts Generate transformation for research topics
 model: sonnet
-tools: WebSearch, WebFetch, Bash, Write, mcp__speech__say
+tools: WebSearch, WebFetch, Bash, Read, Write, mcp__speech__say
 color: blue
 ---
 
@@ -41,11 +41,11 @@ When invoked, execute the following workflow:
 11. **Synthesize Thought**: Write 200-400 word synthesis addressing research question from assigned angle
 12. **Add Inline Citations**: Every claim must have citation: (Author, Year, "Title")
 
-### Phase 4: Quality Scoring & Output
+### Phase 4: Quality Scoring & File Output
 13. **Self-Score Thought**: Evaluate 0-10 based on claim accuracy, citation density, novel insights, coherence
-14. **Compile Sources List**: Include all source URLs with quality ratings
-15. **Return Structured Output**: Format as JSON with thought, score, sources, queries used, operation type, parent ID
-16. **Completion Notification**: Use mcp__speech__say with context-specific summary of findings
+14. **Write to File**: Save findings to provided `output_file_path` (see Output Format)
+15. **Return Metadata Only**: JSON with node_id, file_path, score, impact (max 500 bytes)
+16. **Completion Notification**: Use mcp__speech__say with context-specific summary
 
 **Critical Constraints:**
 - Every factual claim MUST have a source citation
@@ -84,40 +84,44 @@ When invoked, execute the following workflow:
 
 ## Output Format
 
-Return research findings as structured JSON with embedded synthesis:
+**Input (from Main Claude):**
+- `output_file_path`: Where to write findings (e.g., `/path/to/nodes/n1_platform_engineering.md`)
+- `research_angle`: Specific perspective to explore
+- `node_id`: Unique identifier
 
-**Standard Output Template:**
+**Agent Actions:**
+1. Execute research (Phases 1-3)
+2. **Write findings to `output_file_path`** with structure:
+```markdown
+# Node [ID]: [Title]
+**Score:** 8.5/10
+**Adoption Level:** TRIAL
+
+## Summary
+[200-400 word synthesis with inline citations (Author, Year)]
+
+## Key Findings
+- Finding 1 (Source, Year)
+- Finding 2 (Source, Year)
+
+## Sources
+1. URL, Quality: B, Author, Year, "Title"
+2. [...]
+
+## Queries Used
+- Query 1
+- Query 2
+```
+
+3. **Return metadata JSON only** (NOT full text):
 ```json
 {
-  "node_id": "nX_bY",
-  "operation": "Generate",
-  "parent_id": "nX",
-  "branch_id": "Y",
-  "exploration_angle": "current_state | challenges | future_implications | case_studies | expert_opinions",
-  "research_question": "[Original research question]",
-  "thought": "[200-400 word synthesis with inline citations in format: (Author, Year, \"Title\")]",
-  "score": 7.5,
-  "sources": [
-    {
-      "url": "https://example.com/article",
-      "quality_rating": "B",
-      "author": "Smith et al.",
-      "year": 2024,
-      "title": "Full Article Title",
-      "key_claims": ["Claim 1 extracted", "Claim 2 extracted"]
-    }
-  ],
-  "queries_used": [
-    "Direct query variant",
-    "Keyword query variant",
-    "Critical perspective variant"
-  ],
-  "metadata": {
-    "sources_evaluated": 12,
-    "sources_kept": 5,
-    "search_iterations": 2,
-    "timestamp": "2025-10-29T10:30:00Z"
-  }
+  "node_id": "n1",
+  "file_path": "nodes/n1_platform_engineering.md",
+  "score": 8.5,
+  "operational_impact": "HIGH",
+  "sources_count": 6,
+  "word_count": 3200
 }
 ```
 
@@ -218,10 +222,13 @@ CRISPR-Cas9 gene editing has achieved 95% reduction in off-target effects throug
 
 ### Integration Points
 
-**Main Claude Code (Orchestrator):**
-- Receives from Main Claude: Research angle, node ID, parent context (if deepening)
-- Returns to Main Claude: Findings (500 words), sources (6), self-score (0-10), key insights
-- Main Claude saves output to `/RESEARCH/[topic]/nodes/nX.md` and updates graph state
+**Main Claude provides:**
+- `output_file_path`: File path for writing findings
+- Research angle, node_id, parent context (if deepening)
+
+**Agent returns:**
+- Metadata JSON only (~300 bytes), NOT full text
+- Main Claude updates graph_state.json with file pointer
 
 **cod-synthesizer:**
 - This agent's output nodes become input for synthesis (when 5-7 high-scoring nodes exist)

@@ -107,7 +107,7 @@ When invoked, execute the following workflow:
 ### Phase 7: Structured Output & Notification
 17. **Create Folder Structure**: Set up `/RESEARCH/{topic}/` with organized files
 18. **Save All Documents**: Write final report, executive summary, bibliography, metadata, HTML, academic essay
-19. **Generate Manifest**: Create JSON index of all produced files with descriptions
+19. **Return Manifest Only**: JSON with deliverables list, file sizes, corrections applied (max 500 bytes)
 20. **Completion Notification**: Use `mcp__speech__say` with context-specific message:
     - Example: `mcp__speech__say("Research complete - delivered popular science report, interactive HTML visualization, academic essay, ninety-three citations, and source quality assessment")`
 
@@ -152,6 +152,33 @@ When invoked, execute the following workflow:
 ---
 
 ## Output Format
+
+**Input (from Main Claude):**
+- `synthesis_file_path`: Verified synthesis to finalize
+- `verification_file_path`: Verification report
+- `output_directory`: Base directory for deliverables (e.g., "RESEARCH/topic/")
+
+**Agent Actions:**
+1. Read synthesis + verification from files
+2. Write all deliverables to `output_directory` (see File Structure below)
+3. **Return manifest JSON only** (~500 bytes):
+
+```json
+{
+  "node_id": "n11",
+  "deliverables": [
+    {"file": "trend_radar_2025.md", "size_kb": 66, "type": "report"},
+    {"file": "executive_summary.md", "size_kb": 18, "type": "summary"},
+    {"file": "interactive_report.html", "size_kb": 35, "type": "visualization"},
+    {"file": "academic_essay.md", "size_kb": 83, "type": "essay"},
+    {"file": "bibliography.md", "size_kb": 23, "type": "sources"}
+  ],
+  "total_files": 6,
+  "corrections_applied": ["SLSA GA date"]
+}
+```
+
+**File Structure:**
 
 The finalizer produces a structured folder with multiple documents:
 

@@ -18,13 +18,18 @@ Applies Chain-of-Density (CoD) summarization algorithm to merge multiple researc
 
 ## Instructions
 
+**Input (from Main Claude):**
+- `node_file_paths`: Array of node files to merge (e.g., ["nodes/n1.md", "nodes/n3.md", "nodes/n7.md"])
+- `output_file_path`: Where to write synthesis (e.g., "synthesis_final.md")
+
 When invoked, execute the following workflow:
 
 ### Phase 1: Input Analysis & Preparation
-1. **Parse Input Thoughts**: Extract text, scores, sources, and metadata from all k input thoughts
-2. **Identify Maximum Score**: Determine highest input score to set target for aggregated output
-3. **Extract All Citations**: Collect complete list of sources across all thoughts for preservation
-4. **Calculate Target Length**: Determine optimal summary length based on content complexity (typically 300-500 words)
+1. **Read Node Files**: Use Read tool for each path in `node_file_paths`
+2. **Parse Input Thoughts**: Extract text, scores, sources from each file
+3. **Identify Maximum Score**: Determine highest input score to set target
+4. **Extract All Citations**: Collect complete list of sources for preservation
+5. **Calculate Target Length**: Determine optimal summary length (typically 300-500 words)
 
 ### Phase 2: Chain-of-Density Execution (5 Iterations)
 5. **Iteration 1 - Verbose Baseline**: Create initial summary with basic structure, low entity density (~80 words if target is 400)
@@ -40,8 +45,9 @@ When invoked, execute the following workflow:
 13. **Self-Score Output**: Assign quality score (0-10) based on density, completeness, coherence
 
 ### Phase 4: Output Delivery
-14. **Format Result**: Structure output as JSON with node_id, thought, score, operation, parents, sources, cod_iterations
-15. **Completion Notification**: Use mcp__speech__say to announce synthesis completion with key metrics
+14. **Write Synthesis**: Save to `output_file_path` provided by Main Claude
+15. **Return Metadata Only**: JSON with node_id, file_path, score, sources_count (max 500 bytes)
+16. **Completion Notification**: Use mcp__speech__say to announce synthesis completion
 
 **Critical Constraints:**
 - MUST maintain exact target length across all 5 iterations (±5 words tolerance)
@@ -81,22 +87,37 @@ When invoked, execute the following workflow:
 
 ## Output Format
 
-Return JSON structure with synthesis result and metadata:
+**Agent Actions:**
+1. Read all files from `node_file_paths`
+2. Execute 5-iteration CoD algorithm
+3. **Write synthesis to `output_file_path`** (full text with citations)
+4. **Return metadata JSON only**:
 
-**Standard Output Template:**
 ```json
 {
-  "node_id": "n[X]",
-  "thought": "[Maximally dense synthesis with inline citations (Author, Year). All critical findings from input thoughts compressed into target length. Contradictions resolved explicitly. Self-contained and coherent.]",
-  "score": 8.5,
+  "node_id": "n9",
+  "file_path": "synthesis_final.md",
+  "score": 9.2,
   "operation": "Aggregate(CoD)",
   "parents": ["n1", "n3", "n7"],
-  "sources": [
-    "https://source1.com/article",
-    "https://source2.org/paper",
-    "https://source3.edu/study"
-  ],
-  "cod_iterations": [
+  "sources_count": 48,
+  "word_count": 15234,
+  "cod_iterations": 5
+}
+```
+
+**Synthesis File Format:**
+```markdown
+# Synthesis: [Topic]
+**Score:** 9.2/10
+
+[Maximally dense synthesis with inline citations (Author, Year). All critical findings compressed. Contradictions resolved explicitly.]
+
+## Sources
+[Complete bibliography from all input nodes]
+
+## CoD Iteration Log (optional)
+[
     {
       "iteration": 1,
       "length": 82,

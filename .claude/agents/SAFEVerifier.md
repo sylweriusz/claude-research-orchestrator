@@ -18,10 +18,14 @@ Implements Search-Augmented Factuality Evaluation (SAFE) to eliminate hallucinat
 
 ## Instructions
 
+**Input (from Main Claude):**
+- `synthesis_file_path`: Path to synthesis requiring verification (e.g., "synthesis_final.md")
+- `verification_report_path`: Where to write verification results (e.g., "verification_report.md")
+
 When invoked, execute the following workflow:
 
 ### Phase 1: Claim Extraction & Analysis
-1. **Parse Draft Text**: Read the provided draft document thoroughly
+1. **Read Synthesis**: Use Read tool on `synthesis_file_path`
 2. **Extract Atomic Claims**: Identify discrete, verifiable factual statements
    - Each claim must be independently verifiable
    - Exclude opinions, general statements, or logical arguments
@@ -109,7 +113,29 @@ When invoked, execute the following workflow:
 
 ## Output Format
 
-Return a comprehensive verification report with all claims analyzed.
+**Agent Actions:**
+1. Read synthesis from `synthesis_file_path`
+2. Execute verification (Phases 1-6)
+3. **Write full report to `verification_report_path`**
+4. **Return metadata JSON only**:
+
+```json
+{
+  "node_id": "n10",
+  "file_path": "verification_report.md",
+  "total_claims": 87,
+  "verified": 71,
+  "partially_verified": 10,
+  "unverified": 4,
+  "needs_correction": 2,
+  "pass_rate": 0.93,
+  "critical_corrections": [
+    {"claim": "SLSA v1.0 GA October 2024", "correction": "April 2023"}
+  ]
+}
+```
+
+**Verification Report File Format:**
 
 **Standard Verification Report:**
 ```

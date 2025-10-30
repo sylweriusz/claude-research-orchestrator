@@ -789,26 +789,36 @@ When a user requests deep research with **"Deep research [topic]"**, Main Claude
 - Executes searches for ONE specific angle
 - Dynamic query rewriting (3-4 search variations)
 - WebSearch → score sources A-E → WebFetch top 6
-- Returns: findings (500 words) + sources + self-score (0-10)
+- Writes findings (500 words) to file, returns metadata only
 - Used in ALL iterations for exploration and deepening
 
 **3. cod-synthesizer** (Aggregate)
-- Merges 3-7 high-scoring nodes into synthesis
+- Reads 3-7 node files, merges into synthesis
 - 5-iteration Chain-of-Density algorithm
-- Preserves all citations, resolves contradictions
+- Writes synthesis to file, returns metadata only
 - Target: score > max(input_scores)
 
 **4. safe-verifier** (Verification)
-- Extracts atomic claims from synthesis
-- Generates adversarial verification queries
-- Validates via WebSearch
+- Reads synthesis file, extracts atomic claims
+- Validates via adversarial WebSearch queries
+- Writes verification report to file, returns summary only
 - Target: 95%+ pass rate
 
 **5. report-finalizer** (Final Assembly)
-- Reads verified synthesis + graph state
-- Creates full report, executive summary, academic essay, HTML visualization
-- Embeds sentence-level citations
-- Generates bibliography with A-E source ratings
+- Reads synthesis + verification report files
+- Writes all deliverables to files (report, summary, HTML, essay, bibliography)
+- Returns manifest with file list only
+- Embeds sentence-level citations in all outputs
+
+### Agent I/O Protocol
+
+**Rule:** Agents write to files, return metadata only (~300 bytes max).
+
+**Why:** Prevents context overflow. 8 agents returning 15KB each = 120KB wasted. With metadata-only: 8 × 300 bytes = 2.4KB.
+
+**Main Claude:** Pass `output_file_path` when invoking agents. Receive metadata (node_id, file_path, score). Update graph_state.json with pointers, not content.
+
+**Agents:** Write findings to provided file path. Return JSON metadata only. Never return large text blocks.
 
 ### Graph Traversal Strategy (Main Claude executes)
 
@@ -816,9 +826,9 @@ When a user requests deep research with **"Deep research [topic]"**, Main Claude
 ```
 Main Claude:
 1. Spawn 5-10 multi-angle-researcher agents (HIGH priority angles, parallel)
-2. Each agent returns: {node_id, findings, sources[6], score}
-3. Save to: /RESEARCH/[topic]/nodes/n1.md, n2.md, ..., n10.md
-4. Update graph_state_1.json: add nodes, create edges, update frontier
+   Pass output_file_path to each: /RESEARCH/[topic]/nodes/n1.md, n2.md, etc.
+2. Each agent writes findings to file, returns: {node_id, file_path, score}
+3. Update graph_state_1.json: add metadata (file pointers), not content
 5. Prune: KeepBestN(7) - keep top 7 nodes
 6. Decision: IF max_score > 9.5 → skip to Aggregation, ELSE → Iteration 2
 ```
@@ -842,9 +852,9 @@ Decision: IF max_score > 9.5 OR depth > 2 → Aggregation, ELSE → Iteration 3
 ```
 Main Claude:
 1. Identify 5-7 best nodes (score > 8.5)
-2. Spawn cod-synthesizer(nodes=[n6, n8, n10, n7, n9])
-3. CoDSynthesizer returns: {synthesis_node, score: 9.6}
-4. Update graph_state_3.json
+2. Spawn cod-synthesizer with node_file_paths=[nodes/n6.md, nodes/n8.md, ...]
+3. CoDSynthesizer reads files, writes synthesis, returns: {file_path, score: 9.6}
+4. Update graph_state_3.json with synthesis metadata
 5. → Proceed to Verification
 ```
 
